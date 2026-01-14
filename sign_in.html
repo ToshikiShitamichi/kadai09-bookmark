@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事業企画</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="signin-container">
+        <h2 class="signin-title">ログイン</h2>
+        <form class="signin-form" action="./sign_in.php" method="post">
+            <div>
+                <input type="email" name="uMail" id="uMail" placeholder="メールアドレス" required>
+                <span class="err-msg" id="error1">メールアドレスが正しくありません</span>
+            </div>
+            <div>
+                <input type="password" name="password" id="password" placeholder="パスワード" required>
+                <span class="err-msg" id="error2">パスワードが正しくありません</span>
+            </div>
+            <button class="signin-btn">ログイン</button>
+        </form>
+        <hr>
+        <div class="signin-btn-group">
+            <a class="signin-btn">Googleで続ける</a>
+            <a class="signin-btn">GitHubで続ける</a>
+        </div>
+        <span>アカウントをお持ちでないですか？<a href="./sign_up.html">アカウントを作成</a></span>
+    </div>
+    <!-- jQuery読み込み -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        if (location.search === "?status=error1") {
+            $(`#error1`).css("display", "block");
+        }
+        if (location.search === "?status=error2") {
+            $(`#error2`).css("display", "block");
+        }
+    </script>
+</body>
+
+</html>
