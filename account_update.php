@@ -2,12 +2,16 @@
 session_start();
 include("./pdo.php");
 
+$uId = $_SESSION['user']['uId'];
+$uName = $_SESSION['user']['uName'];
+$uMail = $_SESSION['user']['uMail'];
+
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     //データ取得
     $uName = $_POST["uName"];
     $uMail = $_POST["uMail"];
-    $raw_password = $_POST["password"];
 
     // SQL実行
     $sql = '
@@ -17,8 +21,11 @@ FROM
 users_table
 WHERE
 uMail = :uMail
+AND
+uId != :uId
 ';
     $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':uId', $uId, PDO::PARAM_INT);
     $stmt->bindValue(':uMail', $uMail, PDO::PARAM_STR);
     try {
         $status = $stmt->execute();
@@ -34,41 +41,27 @@ uMail = :uMail
             'uMail' => $uMail,
         ];
         $_SESSION['errors'] = [
-            'uMail' => 'このメールアドレスはすでに登録されています。',
+            'uMail' => 'このメールアドレスはすでに使用されています。',
         ];
-        header("Location:sign_up.php");
+        header("Location:account_update.php");
         exit();
     }
 
-    $hashed_password = password_hash($raw_password, PASSWORD_DEFAULT);
-
     // SQL実行
     $sql = '
-INSERT INTO users_table(
-    uId,
-    uName,
-    uMail,
-    password,
-    is_admin,
-    created_at,
-    updated_at,
-    deleted_at
-)
-VALUES(
-    NULL,
-    :uName,
-    :uMail,
-    :password,
-    0,
-    now(),
-    now(),
-    NULL
-)
+UPDATE
+    users_table
+SET
+    uName = :uName,
+    uMail = :uMail,
+    updated_at = now()
+WHERE
+    uId = :uId
 ';
     $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':uId', $uId, PDO::PARAM_INT);
     $stmt->bindValue(':uName', $uName, PDO::PARAM_STR);
     $stmt->bindValue(':uMail', $uMail, PDO::PARAM_STR);
-    $stmt->bindValue(':password', $hashed_password, PDO::PARAM_STR);
     try {
         $status = $stmt->execute();
     } catch (PDOException $e) {
@@ -76,12 +69,12 @@ VALUES(
         exit();
     }
 
-    $_SESSION['user'] = [
-        'uName' => $uName,
-        'uMail' => $uMail,
-    ];
+    $_SESSION['user']['uName'] = $uName;
+    $_SESSION['user']['uMail'] = $uMail;
 
-    header("Location:home.php");
+    $_SESSION['success'] = 'アカウント情報を更新しました';
+
+    header("Location:account_setting.php");
     exit();
 }
 $old = $_SESSION['old'] ?? ['uName' => '', 'uMail' => ''];
@@ -101,31 +94,23 @@ unset($_SESSION['old'], $_SESSION['errors']);
 </head>
 
 <body>
-    <div class="signup-container">
-        <h2 class="signup-title">アカウントを作成</h2>
-        <form class="signup-form" action="./sign_up.php" method="post">
+    <div class="account-setting-container">
+        <h2 class="account-setting-title">アカウント更新</h2>
+        <form class="account-setting-form" action="./account_update.php" method="post">
             <div>
-                <input type="text" name="uName" id="uName" placeholder="ユーザー名" required value="<?= $old["uName"] ?>">
+                <input type="text" name="uName" id="uName" placeholder="ユーザー名" required value="<?= $uName ?>">
             </div>
             <div>
-                <input type="email" name="uMail" id="uMail" placeholder="メールアドレス" required value="<?= $old["uMail"] ?>">
+                <input type="email" name="uMail" id="uMail" placeholder="メールアドレス" required value="<?= $uMail ?>">
                 <?php if (!empty($errors['uMail'])): ?>
                     <span class="err-msg">
                         <?= $errors['uMail'] ?>
                     </span>
                 <?php endif; ?>
             </div>
-            <div>
-                <input type="password" name="password" id="password" placeholder="パスワード" required>
-            </div>
-            <button class="signup-btn">新規登録</button>
+            <button class="account-setting-btn">更新</button>
         </form>
-        <hr>
-        <div class="signup-btn-group">
-            <a class="signup-btn">Googleで続ける</a>
-            <a class="signup-btn">GitHubで続ける</a>
-        </div>
-        <span>すでにアカウントをお持ちですか？<a href="./sign_in.php">ログインする</a></span>
+        <a href="account_setting.php">戻る</a>
     </div>
 </body>
 
