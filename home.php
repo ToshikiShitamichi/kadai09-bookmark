@@ -1,6 +1,7 @@
 <?php
-session_start();
 include("./pdo.php");
+session_start();
+check_session_id();
 
 // ログインユーザー情報を取得
 $uMail = $_SESSION['user']['uMail'];
