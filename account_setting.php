@@ -4,7 +4,6 @@ session_start();
 check_session_id();
 
 // ログインユーザー情報を取得
-$uId = $_SESSION['user']['uId'];
 $uName = $_SESSION['user']['uName'];
 $uMail = $_SESSION['user']['uMail'];
 
