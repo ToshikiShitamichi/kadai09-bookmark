@@ -2,11 +2,15 @@
 session_start();
 include("./pdo.php");
 
+// ログインユーザー情報を取得
 $uId = $_SESSION['user']['uId'];
 $uName = $_SESSION['user']['uName'];
 $uMail = $_SESSION['user']['uMail'];
 
+
 $success = $_SESSION['success'] ?? null;
+
+// 取得したセッションのクリア
 unset($_SESSION['success']);
 ?>
 
@@ -23,6 +27,7 @@ unset($_SESSION['success']);
 <body>
     <div class="account-setting-container">
         <h2 class="account-setting-title">アカウント設定</h2>
+        <!-- サクセスメッセージが登録されていれば表示 -->
         <?php if (!empty($success)): ?>
             <p>
                 <span class="success-msg"><?= $success ?></span>

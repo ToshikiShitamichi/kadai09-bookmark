@@ -2,6 +2,7 @@
 session_start();
 include("./pdo.php");
 
+// POSTリクエストが来たとき
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     //データ取得
@@ -28,18 +29,23 @@ uMail = :uMail
     }
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // 同一メールアドレスのレコード件数
     if ($record["count"] === 1) {
+        // 入力された情報を保持
         $_SESSION['old'] = [
             'uName' => $uName,
             'uMail' => $uMail,
         ];
+        // エラーメッセージを登録
         $_SESSION['errors'] = [
             'uMail' => 'このメールアドレスはすでに登録されています。',
         ];
+        // サインアップ画面再表示
         header("Location:sign_up.php");
         exit();
     }
 
+    // パスワードのハッシュ化
     $hashed_password = password_hash($raw_password, PASSWORD_DEFAULT);
 
     // SQL実行
@@ -76,17 +82,20 @@ VALUES(
         exit();
     }
 
+    // ログインユーザー情報を保持
     $_SESSION['user'] = [
         'uName' => $uName,
         'uMail' => $uMail,
     ];
 
+    // ホーム画面に遷移
     header("Location:home.php");
     exit();
 }
 $old = $_SESSION['old'] ?? ['uName' => '', 'uMail' => ''];
 $errors = $_SESSION['errors'] ?? [];
 
+// 取得したセッションのクリア
 unset($_SESSION['old'], $_SESSION['errors']);
 ?>
 
@@ -109,6 +118,7 @@ unset($_SESSION['old'], $_SESSION['errors']);
             </div>
             <div>
                 <input type="email" name="uMail" id="uMail" placeholder="メールアドレス" required value="<?= $old["uMail"] ?>">
+                <!-- エラーメッセージが登録されていれば表示 -->
                 <?php if (!empty($errors['uMail'])): ?>
                     <span class="err-msg">
                         <?= $errors['uMail'] ?>

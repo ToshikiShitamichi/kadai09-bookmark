@@ -2,6 +2,7 @@
 session_start();
 include("./pdo.php");
 
+// ログインユーザー情報を取得
 $uMail = $_SESSION['user']['uMail'];
 
 // SQL実行
@@ -25,6 +26,7 @@ try {
 }
 $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// ユーザーIDをセッションに保持
 $_SESSION['user']['uId'] = $record['uId'];
 
 ?>

@@ -2,8 +2,10 @@
 session_start();
 include("./pdo.php");
 
+// ログインユーザー情報を取得
 $uId = $_SESSION['user']['uId'];
 
+// POSTリクエストが来たとき
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // SQL実行
@@ -23,12 +25,14 @@ WHERE
         exit();
     }
 
+    // サインアップ画面に遷移
     header("Location:sign_up.php");
     exit();
 }
 $old = $_SESSION['old'] ?? ['uName' => '', 'uMail' => ''];
 $errors = $_SESSION['errors'] ?? [];
 
+// 取得したセッションのクリア
 unset($_SESSION['old'], $_SESSION['errors']);
 ?>
 

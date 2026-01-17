@@ -2,11 +2,12 @@
 session_start();
 include("./pdo.php");
 
+// ログインユーザー情報を取得
 $uId = $_SESSION['user']['uId'];
 $uName = $_SESSION['user']['uName'];
 $uMail = $_SESSION['user']['uMail'];
 
-
+// POSTリクエストが来たとき
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     //データ取得
@@ -35,14 +36,18 @@ uId != :uId
     }
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // 同一メールアドレスのレコードが存在する場合
     if ($record["count"] === 1) {
+        // 入力された情報を保持
         $_SESSION['old'] = [
             'uName' => $uName,
             'uMail' => $uMail,
         ];
+        // エラーメッセージを登録
         $_SESSION['errors'] = [
             'uMail' => 'このメールアドレスはすでに使用されています。',
         ];
+        // アカウント設定画面再表示
         header("Location:account_update.php");
         exit();
     }
@@ -69,9 +74,11 @@ WHERE
         exit();
     }
 
+    // ログインユーザー情報を更新
     $_SESSION['user']['uName'] = $uName;
     $_SESSION['user']['uMail'] = $uMail;
 
+    // サクセスメッセージを登録
     $_SESSION['success'] = 'アカウント情報を更新しました';
 
     header("Location:account_setting.php");
@@ -80,6 +87,7 @@ WHERE
 $old = $_SESSION['old'] ?? ['uName' => '', 'uMail' => ''];
 $errors = $_SESSION['errors'] ?? [];
 
+// 取得したセッションのクリア
 unset($_SESSION['old'], $_SESSION['errors']);
 ?>
 
@@ -102,6 +110,7 @@ unset($_SESSION['old'], $_SESSION['errors']);
             </div>
             <div>
                 <input type="email" name="uMail" id="uMail" placeholder="メールアドレス" required value="<?= $uMail ?>">
+                <!-- エラーメッセージが登録されていれば表示 -->
                 <?php if (!empty($errors['uMail'])): ?>
                     <span class="err-msg">
                         <?= $errors['uMail'] ?>
