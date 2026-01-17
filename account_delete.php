@@ -11,9 +11,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // SQL実行
     $sql = '
-DELETE
-FROM
-    `users_table`
+UPDATE
+    users_table
+SET
+    deleted_at = now()
 WHERE
     uId = :uId
 ';
@@ -26,8 +27,14 @@ WHERE
         exit();
     }
 
-    // サインアップ画面に遷移
-    header("Location:sign_up.php");
+    $_SESSION = array();
+    if (isset($_COOKIE[session_name()])) {
+        setcookie(session_name(), '', time() - 42000, '/');
+    }
+    session_destroy();
+
+    // トップ画面に遷移
+    header("Location:index.html");
     exit();
 }
 $old = $_SESSION['old'] ?? ['uName' => '', 'uMail' => ''];
