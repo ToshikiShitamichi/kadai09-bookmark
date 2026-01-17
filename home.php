@@ -3,33 +3,6 @@ include("./pdo.php");
 session_start();
 check_session_id();
 
-// ログインユーザー情報を取得
-$uMail = $_SESSION['user']['uMail'];
-
-// SQL実行
-$sql = '
-SELECT
-    uId,
-    uName,
-    uMail
-FROM
-    users_table
-WHERE
-    uMail = :uMail
-';
-$stmt = $pdo->prepare($sql);
-$stmt->bindValue(':uMail', $uMail, PDO::PARAM_STR);
-try {
-    $status = $stmt->execute();
-} catch (PDOException $e) {
-    echo json_encode(["sql error" => "{$e->getMessage()}"]);
-    exit();
-}
-$record = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// ユーザーIDをセッションに保持
-$_SESSION['user']['uId'] = $record['uId'];
-
 ?>
 
 <!DOCTYPE html>
@@ -47,6 +20,7 @@ $_SESSION['user']['uId'] = $record['uId'];
     <ul class="dropdown" style="display: none;">
         <li style="list-style: none;">
             <a href="./account_setting.php">アカウント設定</a>
+            <a href="./sign_out.php">サインアウト</a>
         </li>
     </ul>
     <!-- jQuery読み込み -->
