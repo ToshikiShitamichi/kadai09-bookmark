@@ -2,6 +2,13 @@
 session_start();
 include("./pdo.php");
 
+if (isset($_SESSION["session_id"]) && $_SESSION["session_id"] === session_id()){
+    session_regenerate_id(true);
+    $_SESSION["session_id"] = session_id();
+    header('Location:home.php');
+    exit();
+}
+
 // POSTリクエストが来たとき
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -82,10 +89,34 @@ VALUES(
         exit();
     }
 
+    // SQL実行
+    $sql = '
+SELECT
+    *
+FROM
+    users_table
+WHERE
+    uMail = :uMail
+AND
+    deleted_at is NULL
+';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':uMail', $uMail, PDO::PARAM_STR);
+    try {
+        $status = $stmt->execute();
+    } catch (PDOException $e) {
+        echo json_encode(["sql error" => "{$e->getMessage()}"]);
+        exit();
+    }
+    $record = $stmt->fetch(PDO::FETCH_ASSOC);
+
     // ログインユーザー情報を保持
+    $_SESSION['session_id'] = session_id();
     $_SESSION['user'] = [
-        'uName' => $uName,
-        'uMail' => $uMail,
+        'uId' => $record['uId'],
+        'uName' => $record['uName'],
+        'uMail' => $record['uMail'],
+        'is_admin' => $record['is_admin']
     ];
 
     // ホーム画面に遷移

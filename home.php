@@ -3,6 +3,8 @@ include("./pdo.php");
 session_start();
 check_session_id();
 
+$is_admin = $_SESSION["user"]["is_admin"];
+
 ?>
 
 <!DOCTYPE html>
@@ -15,6 +17,9 @@ check_session_id();
 </head>
 
 <body>
+    <?php if ($is_admin === 1): ?>
+        <a href="./admin.php">管理者画面</a>
+    <?php endif ?>
     <h1>ダッシュボード</h1>
     <img class="account-icon" src="./default.png" alt="" style="width: 50px;">
     <ul class="dropdown" style="display: none;">
